@@ -26,8 +26,9 @@ public class BallinCircle implements ApplicationListener {
     private static final float BALL_D = BALL_R * 2f;
     private static final float MAX_DST = CIRCLE_R - BALL_R;
     private final Vector2 circlePos = new Vector2();
-    private final Vector2 ballPos = new Vector2(0.15f, 0.04f);
-    private final Vector2 ballV = new Vector2(0f, 0.12f);
+    private final Vector2 ballPos = new Vector2(MAX_DST * (float)Math.sqrt(2f) / 2f, 0f);
+    private final Vector2 ballV = new Vector2(0f, 0.2f);
+    private final Vector2 g = new Vector2(0f, -0.2f);
 	
 	@Override
 	public void create () {
@@ -54,20 +55,32 @@ public class BallinCircle implements ApplicationListener {
     }
 
     private final Vector2 d = new Vector2();
+    private static final int ITERATIONS = 1000;
 
 	@Override
 	public void render () {
+        //update
+        float dt = Gdx.graphics.getDeltaTime();
+//        ballV.mulAdd(g, dt);
+        dt /= ITERATIONS;
+        for (int i = 0; i < ITERATIONS; i++) {
+            ballPos.mulAdd(ballV, dt);
+            if (ballPos.dst(circlePos) > MAX_DST) {
+                d.set(ballPos).sub(circlePos).nor().scl(MAX_DST);
+                ballPos.set(circlePos).add(d);
+                float anglePos = d.angle();
+                float angleV = ballV.angle();
+                float angle = 2f * (90f - (angleV - anglePos));
+                System.out.println(angle);
+                ballV.rotate(angle);
+            }
+        }
+        //draw
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
-        ballPos.mulAdd(ballV, Gdx.graphics.getDeltaTime());
         batch.draw(regionCircle, -0.5f, -0.5f, 1f, 1f);
         batch.draw(regionBall, ballPos.x - BALL_R, ballPos.y - BALL_R, BALL_D, BALL_D);
-        if(ballPos.dst(circlePos) > MAX_DST) {
-            d.set(ballPos).sub(circlePos).nor().scl(MAX_DST);
-            ballPos.set(circlePos).add(d);
-            ballV.rotate(170);
-        }
         batch.end();
 	}
 
