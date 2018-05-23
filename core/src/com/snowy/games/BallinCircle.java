@@ -61,21 +61,19 @@ public class BallinCircle implements ApplicationListener {
 	public void render () {
         //update
         float dt = Gdx.graphics.getDeltaTime();
-//        ballV.mulAdd(g, dt);
         dt /= ITERATIONS;
         for (int i = 0; i < ITERATIONS; i++) {
+            ballV.mulAdd(g, dt);
             ballPos.mulAdd(ballV, dt);
             if (ballPos.dst(circlePos) > MAX_DST) {
                 d.set(ballPos).sub(circlePos).nor().scl(MAX_DST);
                 ballPos.set(circlePos).add(d);
-                float anglePos = d.angle();
-                float angleV = ballV.angle();
-                float angle = 2f * (90f - (angleV - anglePos));
-                System.out.println(angle);
+                float angle = 2f * (90f - (ballV.angle() - d.angle()));
+//                System.out.println(angle);
                 ballV.rotate(angle);
             }
         }
-        //draw
+//        //draw
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
