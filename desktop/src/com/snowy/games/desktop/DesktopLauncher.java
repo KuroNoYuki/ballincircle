@@ -2,11 +2,11 @@ package com.snowy.games.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.snowy.games.ballincircle;
+import com.snowy.games.BallinCircle;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new ballincircle(), config);
+		new LwjglApplication(new BallinCircle(), config);
 	}
 }

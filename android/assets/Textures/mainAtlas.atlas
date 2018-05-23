@@ -1,0 +1,20 @@
+
+mainAtlas.png
+size: 2048,2048
+format: RGBA8888
+filter: MipMapLinearNearest,Linear
+repeat: none
+ball
+  rotate: false
+  xy: 8, 8
+  size: 150, 150
+  orig: 150, 150
+  offset: 0, 0
+  index: -1
+circle
+  rotate: false
+  xy: 8, 166
+  size: 1156, 1156
+  orig: 1156, 1156
+  offset: 0, 0
+  index: -1
