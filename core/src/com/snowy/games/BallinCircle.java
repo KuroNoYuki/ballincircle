@@ -21,10 +21,13 @@ public class BallinCircle implements ApplicationListener {
     private TextureRegion regionCircle;
     private TextureRegion regionBall;
 
+    private static final float CIRCLE_R = 0.26f;
     private static final float BALL_R = 0.05f;
     private static final float BALL_D = BALL_R * 2f;
-    private final Vector2 ballPos = new Vector2(0.1f, 0.05f);
-    private final Vector2 ballV = new Vector2(0.04f, 0.06f);
+    private static final float MAX_DST = CIRCLE_R - BALL_R;
+    private final Vector2 circlePos = new Vector2();
+    private final Vector2 ballPos = new Vector2(0.15f, 0.04f);
+    private final Vector2 ballV = new Vector2(0f, 0.12f);
 	
 	@Override
 	public void create () {
@@ -50,13 +53,21 @@ public class BallinCircle implements ApplicationListener {
         mat.idt().translate(dst.pos.x, dst.pos.y, 0f).scale(scaleX, scaleY, 1f).translate(-src.pos.x, -src.pos.y, 0f);
     }
 
+    private final Vector2 d = new Vector2();
+
 	@Override
 	public void render () {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
+        ballPos.mulAdd(ballV, Gdx.graphics.getDeltaTime());
         batch.draw(regionCircle, -0.5f, -0.5f, 1f, 1f);
         batch.draw(regionBall, ballPos.x - BALL_R, ballPos.y - BALL_R, BALL_D, BALL_D);
+        if(ballPos.dst(circlePos) > MAX_DST) {
+            d.set(ballPos).sub(circlePos).nor().scl(MAX_DST);
+            ballPos.set(circlePos).add(d);
+            ballV.rotate(170);
+        }
         batch.end();
 	}
 
