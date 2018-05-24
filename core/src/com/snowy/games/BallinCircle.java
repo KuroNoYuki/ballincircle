@@ -2,6 +2,8 @@ package com.snowy.games;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -10,7 +12,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.snowy.games.math.Rect;
 
-public class BallinCircle implements ApplicationListener {
+public class BallinCircle implements ApplicationListener, InputProcessor, Input.TextInputListener {
 
     private final Rect worldBounds = new Rect();
     private final Rect glBounds = new Rect(0f, 0f, 1f, 1f);
@@ -26,8 +28,9 @@ public class BallinCircle implements ApplicationListener {
     private static final float BALL_D = BALL_R * 2f;
     private static final float MAX_DST = CIRCLE_R - BALL_R;
     private final Vector2 circlePos = new Vector2();
-    private final Vector2 ballPos = new Vector2(MAX_DST * (float)Math.sqrt(2f) / 2f, 0f);
-    private final Vector2 ballV = new Vector2(0f, 0.2f);
+//    private final Vector2 ballPos = new Vector2(MAX_DST * (float)Math.sqrt(2f) / 2f, 0f);
+    private final Vector2 ballPos = new Vector2(-0.15f, 0.1f);
+    private final Vector2 ballV = new Vector2(0.1f, 0.2f);
     private final Vector2 g = new Vector2(0f, -0.2f);
 	
 	@Override
@@ -36,6 +39,8 @@ public class BallinCircle implements ApplicationListener {
 		atlas = new TextureAtlas("Textures/mainAtlas.atlas");
         regionCircle = atlas.findRegion("circle");
         regionBall = atlas.findRegion("ball");
+        Gdx.input.setInputProcessor(this);
+        System.gc();
 	}
 
 	@Override
@@ -97,4 +102,61 @@ public class BallinCircle implements ApplicationListener {
 		batch.dispose();
         atlas.dispose();
 	}
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        Gdx.input.getTextInput(this, "Input x y vx vy", "" ,"");
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(int amount) {
+        return false;
+    }
+
+    @Override
+    public void input(String text) {
+        String[] tokens = text.split(" ");
+        float x = Float.parseFloat(tokens[0]);
+        float y = Float.parseFloat(tokens[1]);
+        float vx = Float.parseFloat(tokens[2]);
+        float vy = Float.parseFloat(tokens[3]);
+        ballPos.set(x, y);
+        ballV.set(vx, vy);
+    }
+
+    @Override
+    public void canceled() {
+
+    }
 }
