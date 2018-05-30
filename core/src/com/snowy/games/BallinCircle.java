@@ -24,7 +24,7 @@ public class BallinCircle implements ApplicationListener, InputProcessor, Input.
     private TextureRegion regionBall;
 
     private static final float CIRCLE_R = 0.26f;
-    private static final float BALL_R = 0.05f;
+    private static final float BALL_R = 0.005f;
     private static final float BALL_D = BALL_R * 2f;
     private static final float MAX_DST = CIRCLE_R - BALL_R;
     private final Vector2 circlePos = new Vector2();
@@ -60,7 +60,7 @@ public class BallinCircle implements ApplicationListener, InputProcessor, Input.
     }
 
     private final Vector2 d = new Vector2();
-    private static final int ITERATIONS = 1000;
+    private static final int ITERATIONS = 2000;
 
 	@Override
 	public void render () {
@@ -125,7 +125,7 @@ public class BallinCircle implements ApplicationListener, InputProcessor, Input.
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        Gdx.input.getTextInput(this, "Input x y vx vy", "" ,"");
+        Gdx.input.getTextInput(this, "Input x y vx vy g", "" ,"");
         return false;
     }
 
@@ -151,8 +151,10 @@ public class BallinCircle implements ApplicationListener, InputProcessor, Input.
         float y = Float.parseFloat(tokens[1]);
         float vx = Float.parseFloat(tokens[2]);
         float vy = Float.parseFloat(tokens[3]);
+        float gravity = Float.parseFloat(tokens[4]);
         ballPos.set(x, y);
         ballV.set(vx, vy);
+        g.set(0, -gravity);
     }
 
     @Override
