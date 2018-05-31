@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.snowy.games.math.Rect;
 import com.snowy.games.sprites.CircleSprite;
+import com.snowy.games.trackers.TrackerPool;
 
 public class BallinCircle implements ApplicationListener, InputProcessor, Input.TextInputListener {
 
@@ -23,6 +24,7 @@ public class BallinCircle implements ApplicationListener, InputProcessor, Input.
 	private TextureAtlas atlas;
     private CircleSprite circle;
     private Ball ball;
+    private TrackerPool trackerPool;
 
     private static final float CIRCLE_R = 0.26f;
 
@@ -32,6 +34,10 @@ public class BallinCircle implements ApplicationListener, InputProcessor, Input.
     private static final float G = 0.2f;
 
     private static final float MAX_DST = CIRCLE_R - BALL_R;
+
+    private static final float TRACKER_R = 0.01f;
+    private static final float TACKER_INTERVAL = 0.1f;
+    private float trackerTimer;
 	
 	@Override
 	public void create () {
@@ -39,6 +45,7 @@ public class BallinCircle implements ApplicationListener, InputProcessor, Input.
 		atlas = new TextureAtlas("Textures/mainAtlas.atlas");
         circle = new CircleSprite(atlas.findRegion("circle"), 0.5f);
         ball = new Ball(atlas.findRegion("ball"), BALL_R, BALL_V0X, BALL_V0Y, G);
+        trackerPool = new TrackerPool(atlas.findRegion("tracker"), TRACKER_R);
         Gdx.input.setInputProcessor(this);
         Gdx.gl.glClearColor(1, 1, 1, 1);
         System.gc();
@@ -70,6 +77,13 @@ public class BallinCircle implements ApplicationListener, InputProcessor, Input.
 	}
 
 	private void update(float dt) {
+        trackerTimer += dt;
+        if(trackerTimer >= TACKER_INTERVAL) {
+            trackerTimer = 0f;
+            trackerPool.obtain().set(ball.getPos());
+        }
+        trackerPool.updateActiveObjects(dt);
+        trackerPool.freeAllDestroyedActiveObjects();
         dt /= ITERATIONS;
         for (int i = 0; i < ITERATIONS; i++) {
             ball.update(dt);
@@ -90,6 +104,7 @@ public class BallinCircle implements ApplicationListener, InputProcessor, Input.
         batch.begin();
         circle.draw(batch);
         ball.draw(batch);
+        trackerPool.drawActiveObjects(batch);
         batch.end();
     }
 
