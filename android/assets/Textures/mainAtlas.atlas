@@ -18,3 +18,10 @@ circle
   orig: 1156, 1156
   offset: 0, 0
   index: -1
+tracker
+  rotate: false
+  xy: 1172, 1302
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: -1
