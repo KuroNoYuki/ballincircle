@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.snowy.games.math.Rect;
+import com.snowy.games.sprites.CircleSprite;
 
 public class BallinCircle implements ApplicationListener, InputProcessor, Input.TextInputListener {
 
@@ -20,26 +21,26 @@ public class BallinCircle implements ApplicationListener, InputProcessor, Input.
 
 	private SpriteBatch batch;
 	private TextureAtlas atlas;
-    private TextureRegion regionCircle;
-    private TextureRegion regionBall;
+    private CircleSprite circle;
+    private Ball ball;
 
     private static final float CIRCLE_R = 0.26f;
-    private static final float BALL_R = 0.005f;
-    private static final float BALL_D = BALL_R * 2f;
+
+    private static final float BALL_R = 0.05f;
+    private static final float BALL_V0X = 0.1f;
+    private static final float BALL_V0Y = 0.2f;
+    private static final float G = 0.2f;
+
     private static final float MAX_DST = CIRCLE_R - BALL_R;
-    private final Vector2 circlePos = new Vector2();
-//    private final Vector2 ballPos = new Vector2(MAX_DST * (float)Math.sqrt(2f) / 2f, 0f);
-    private final Vector2 ballPos = new Vector2(-0.15f, 0.1f);
-    private final Vector2 ballV = new Vector2(0.1f, 0.2f);
-    private final Vector2 g = new Vector2(0f, -0.2f);
 	
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		atlas = new TextureAtlas("Textures/mainAtlas.atlas");
-        regionCircle = atlas.findRegion("circle");
-        regionBall = atlas.findRegion("ball");
+        circle = new CircleSprite(atlas.findRegion("circle"), 0.5f);
+        ball = new Ball(atlas.findRegion("ball"), BALL_R, BALL_V0X, BALL_V0Y, G);
         Gdx.input.setInputProcessor(this);
+        Gdx.gl.glClearColor(1, 1, 1, 1);
         System.gc();
 	}
 
@@ -60,32 +61,37 @@ public class BallinCircle implements ApplicationListener, InputProcessor, Input.
     }
 
     private final Vector2 d = new Vector2();
-    private static final int ITERATIONS = 2000;
+    private static final int ITERATIONS = 500;
 
 	@Override
 	public void render () {
-        //update
-        float dt = Gdx.graphics.getDeltaTime();
+        update(Gdx.graphics.getDeltaTime());
+        draw(batch);
+	}
+
+	private void update(float dt) {
         dt /= ITERATIONS;
         for (int i = 0; i < ITERATIONS; i++) {
-            ballV.mulAdd(g, dt);
-            ballPos.mulAdd(ballV, dt);
+            ball.update(dt);
+            final Vector2 ballPos = ball.getPos();
+            final Vector2 circlePos = circle.getPos();
             if (ballPos.dst(circlePos) > MAX_DST) {
                 d.set(ballPos).sub(circlePos).nor().scl(MAX_DST);
                 ballPos.set(circlePos).add(d);
-                float angle = 2f * (90f - (ballV.angle() - d.angle()));
+                float angle = 2f * (90f - (ball.getV().angle() - d.angle()));
 //                System.out.println(angle);
-                ballV.rotate(angle);
+                ball.getV().rotate(angle);
             }
         }
-//        //draw
-		Gdx.gl.glClearColor(1, 1, 1, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-        batch.draw(regionCircle, -0.5f, -0.5f, 1f, 1f);
-        batch.draw(regionBall, ballPos.x - BALL_R, ballPos.y - BALL_R, BALL_D, BALL_D);
+    }
+
+    private void draw(SpriteBatch batch) {
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.begin();
+        circle.draw(batch);
+        ball.draw(batch);
         batch.end();
-	}
+    }
 
 	@Override
 	public void pause() {
@@ -152,9 +158,9 @@ public class BallinCircle implements ApplicationListener, InputProcessor, Input.
         float vx = Float.parseFloat(tokens[2]);
         float vy = Float.parseFloat(tokens[3]);
         float gravity = Float.parseFloat(tokens[4]);
-        ballPos.set(x, y);
-        ballV.set(vx, vy);
-        g.set(0, -gravity);
+        ball.getPos().set(x, y);
+        ball.getV().set(vx, vy);
+        ball.getG().set(0, -gravity);
     }
 
     @Override
